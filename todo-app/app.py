@@ -8,6 +8,8 @@ Tres capas, en este orden de dependencia:
 app.py orquesta y no decide nada: pide una decisión a tasks.py (¿es válido este
 texto?) y, si es positiva, la escribe en storage. Las reglas viven una sola vez.
 
+El aspecto visual sale de .streamlit/config.toml, no de CSS inyectado.
+
 PERSISTENCIA: las tareas viven en tasks.db (SQLite). st.session_state sigue
 siendo la copia de trabajo del render, cargada desde la base al abrir la sesión.
 """
@@ -29,7 +31,7 @@ from tasks import (
     toggle_task,
 )
 
-st.set_page_config(page_title="ToDo", page_icon="📝", layout="centered")
+st.set_page_config(page_title="Gestión de tareas", layout="centered")
 
 ETIQUETAS = {
     Filter.ALL: "Todas",
@@ -58,34 +60,33 @@ def _iniciar_estado() -> None:
 
 
 def _seccion_agregar() -> None:
-    st.subheader("Agregar tarea")
+    # El contenedor con borde hace de tarjeta. Es nativo de Streamlit (1.29+) y
+    # evita el CSS inyectado, que se rompe cada vez que Streamlit renombra
+    # sus clases internas.
+    with st.container(border=True):
+        with st.form("agregar", clear_on_submit=False):
+            texto = st.text_input(
+                "Nueva tarea",
+                placeholder="Escribí la tarea y presioná Enter",
+                key=f"nueva_tarea_{st.session_state.input_version}",
+            )
+            enviado = st.form_submit_button("Agregar", type="primary")
 
-    # El form evita un rerun por cada tecla. Cambiar el key del text_input es lo
-    # que limpia el campo: con la misma key Streamlit recuerda el valor.
-    with st.form("agregar", clear_on_submit=False):
-        texto = st.text_input(
-            "Nueva tarea",
-            placeholder="¿Qué hay que hacer?",
-            label_visibility="collapsed",
-            key=f"nueva_tarea_{st.session_state.input_version}",
-        )
-        enviado = st.form_submit_button("Agregar", type="primary")
+        if not enviado:
+            return
 
-    if not enviado:
-        return
+        try:
+            nuevas = add_task(st.session_state.tasks, texto)
+        except TaskError as error:
+            # No se incrementa input_version: si el texto era inválido, el
+            # usuario lo tiene que ver en la caja para poder corregirlo.
+            st.error(str(error))
+            return
 
-    try:
-        nuevas = add_task(st.session_state.tasks, texto)
-    except TaskError as error:
-        # No se incrementa input_version: si el texto era inválido, el usuario
-        # lo tiene que ver en la caja para poder corregirlo.
-        st.error(str(error))
-        return
-
-    _store().insert(nuevas[-1])
-    st.session_state.tasks = nuevas
-    st.session_state.input_version += 1
-    st.rerun()
+        _store().insert(nuevas[-1])
+        st.session_state.tasks = nuevas
+        st.session_state.input_version += 1
+        st.rerun()
 
 
 def _seccion_filtro() -> Filter:
@@ -103,11 +104,11 @@ def _fila(tarea: Task) -> None:
 
     if editando:
         with st.form(f"editar_{tarea.id}"):
-            nuevo = st.text_input("Texto", value=tarea.text, label_visibility="collapsed")
-            guardar, cancelar = st.columns(2)
-            with guardar:
+            nuevo = st.text_input("Texto de la tarea", value=tarea.text)
+            col_guardar, col_cancelar = st.columns(2)
+            with col_guardar:
                 ok = st.form_submit_button("Guardar", type="primary")
-            with cancelar:
+            with col_cancelar:
                 fuera = st.form_submit_button("Cancelar")
 
         if fuera:
@@ -124,7 +125,7 @@ def _fila(tarea: Task) -> None:
             st.rerun()
         return
 
-    col_texto, col_editar, col_borrar = st.columns([0.7, 0.15, 0.15])
+    col_texto, col_editar, col_borrar = st.columns([0.62, 0.19, 0.19])
 
     with col_texto:
         marcado = st.checkbox(tarea.text, value=tarea.completed, key=f"tarea_{tarea.id}")
@@ -133,20 +134,20 @@ def _fila(tarea: Task) -> None:
                 st.session_state.tasks = toggle_task(st.session_state.tasks, tarea.id)
             except TaskNotFoundError:
                 # No debería pasar: la lista que se dibuja ES session_state.
-                # Si pasa, es que el estado se desfasó, y tragarse el error
-                # escondería la causa real detrás de un "el clic no hizo nada".
+                # Si pasa, el estado se desfasó, y tragarse el error escondería
+                # la causa real detrás de un "el clic no hizo nada".
                 st.warning("No se encontró la tarea. Recargá la página.")
                 return
             _store().update(next(t for t in st.session_state.tasks if t.id == tarea.id))
             st.rerun()
 
     with col_editar:
-        if st.button("✏️", key=f"editar_{tarea.id}", help="Editar"):
+        if st.button("Editar", key=f"editar_{tarea.id}"):
             st.session_state.editando = tarea.id
             st.rerun()
 
     with col_borrar:
-        if st.button("🗑️", key=f"borrar_{tarea.id}", help="Borrar"):
+        if st.button("Eliminar", key=f"borrar_{tarea.id}"):
             try:
                 st.session_state.tasks = delete_task(st.session_state.tasks, tarea.id)
             except TaskNotFoundError:
@@ -164,16 +165,18 @@ def _seccion_lista(criterio: Filter) -> None:
         return
 
     for tarea in visibles:
-        _fila(tarea)
+        with st.container(border=True):
+            _fila(tarea)
 
 
 def main() -> None:
     _iniciar_estado()
 
-    st.title("📝 ToDo")
+    st.title("Gestión de tareas")
     st.caption("Las tareas se guardan en tasks.db y sobreviven a cerrar el navegador.")
 
     _seccion_agregar()
+
     st.divider()
 
     criterio = _seccion_filtro()

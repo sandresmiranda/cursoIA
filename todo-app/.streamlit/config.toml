@@ -1,0 +1,74 @@
+# Tema corporativo. Todo nativo de Streamlit: nada de CSS inyectado con
+# unsafe_allow_html. El CSS inyectado depende de clases internas (.stButton,
+# .stCheckbox...) que Streamlit renombra entre versiones; esto no.
+
+[theme]
+base = "light"
+
+# --- Paleta ---
+# Azul marino sobrio en vez del rojo por defecto de Streamlit. El rojo es la
+# marca de la librería; una app corporativa necesita leer como sistema, no
+# como demo.
+primaryColor = "#1F4E79"
+backgroundColor = "#FFFFFF"
+secondaryBackgroundColor = "#F4F6F9"
+textColor = "#1F2933"
+borderColor = "#D9E0E8"
+linkColor = "#1F4E79"
+linkUnderline = false
+
+# --- Tipografía ---
+# Stack de sistema: no depende de red ni de un CDN. Inter si está instalada,
+# si no cae en la siguiente. Corporate y sin request externo.
+font = "Inter, -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Helvetica, Arial, sans-serif"
+headingFont = "Inter, -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Helvetica, Arial, sans-serif"
+
+# Titulares mas chicos que los de Streamlit: 2.75rem para un H1 es una
+# landing page, no una herramienta de trabajo.
+headingFontSizes = ["1.75rem", "1.45rem", "1.2rem", "1.1rem", "1rem", "0.95rem"]
+headingFontWeights = ["600", "600", "600", "600", "600", "600"]
+
+baseFontSize = 15        # entero, en px
+baseFontWeight = 400    # entero, multiplo de 50, 100-600
+metricValueFontSize = "1.6rem"
+metricValueFontWeight = 600
+
+# --- Formas ---
+# Bordes casi rectos. Streamlit redondea a 1rem por defecto, que se lee como
+# producto de consumo; 4px es el default de Material y de la mayoria de los
+# sistemas internos.
+baseRadius = "4px"
+buttonRadius = "4px"
+showWidgetBorder = true
+showSidebarBorder = true
+
+# --- Código ---
+codeFont = "ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace"
+codeFontSize = "13px"
+codeBackgroundColor = "#F4F6F9"
+codeTextColor = "#1F2933"
+
+# --- Semánticos ---
+# Tonos apagados. Los defaults de Streamlit son saturados, y un rojo de error
+# muy vivo compite con la atencion del texto.
+grayColor = "#6B7A8F"
+grayBackgroundColor = "#F4F6F9"
+grayTextColor = "#1F2933"
+blueColor = "#1F4E79"
+blueBackgroundColor = "#EAF1F8"
+blueTextColor = "#1F4E79"
+greenColor = "#1B7F5A"
+greenBackgroundColor = "#E8F5EF"
+greenTextColor = "#145C42"
+redColor = "#B3261E"
+redBackgroundColor = "#FBEDEC"
+redTextColor = "#8C1D18"
+orangeColor = "#B45309"
+orangeBackgroundColor = "#FDF3E7"
+orangeTextColor = "#8A3F06"
+yellowColor = "#A16207"
+yellowBackgroundColor = "#FEF9E7"
+yellowTextColor = "#7A4B05"
+violetColor = "#5B4B8A"
+violetBackgroundColor = "#F0EDF7"
+violetTextColor = "#453A6B"
