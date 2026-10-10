@@ -1,0 +1,15 @@
+[project]
+name = "todo-app"
+version = "0.1.0"
+description = "ToDo en Streamlit con logica separada de la interfaz"
+requires-python = ">=3.10"
+dependencies = ["streamlit>=1.40"]
+
+[project.optional-dependencies]
+dev = ["pytest>=8.0"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+# Sin esto, pytest solo agrega tests/ al sys.path y `import tasks` falla.
+pythonpath = ["."]
+addopts = "-v --tb=short"
