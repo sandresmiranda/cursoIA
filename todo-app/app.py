@@ -67,7 +67,7 @@ def _seccion_agregar() -> None:
         with st.form("agregar", clear_on_submit=False):
             texto = st.text_input(
                 "Nueva tarea",
-                placeholder="Escribí la tarea y presioná Enter",
+                placeholder="Escribe la tarea y presiona Enter",
                 key=f"nueva_tarea_{st.session_state.input_version}",
             )
             enviado = st.form_submit_button("Agregar", type="primary")
@@ -136,7 +136,7 @@ def _fila(tarea: Task) -> None:
                 # No debería pasar: la lista que se dibuja ES session_state.
                 # Si pasa, el estado se desfasó, y tragarse el error escondería
                 # la causa real detrás de un "el clic no hizo nada".
-                st.warning("No se encontró la tarea. Recargá la página.")
+                st.warning("No se encontró la tarea. Recarga la página.")
                 return
             _store().update(next(t for t in st.session_state.tasks if t.id == tarea.id))
             st.rerun()
@@ -151,7 +151,7 @@ def _fila(tarea: Task) -> None:
             try:
                 st.session_state.tasks = delete_task(st.session_state.tasks, tarea.id)
             except TaskNotFoundError:
-                st.warning("No se encontró la tarea. Recargá la página.")
+                st.warning("No se encontró la tarea. Recarga la página.")
                 return
             _store().delete(tarea.id)
             st.rerun()

@@ -2,7 +2,7 @@
 
 Esta capa existe separada de la interfaz por una razón concreta — los tests
 corren sin Streamlit instalado, sin navegador y sin servidor, en milisegundos.
-Si algo acá necesitara la UI, esa separación estaría rota.
+Si algo aquí necesitara la UI, esa separación estaría rota.
 
 Las funciones no mutan la lista que reciben: devuelven una lista nueva. Es la
 razón por la que la UI puede guardar el resultado en st.session_state sin
@@ -98,7 +98,7 @@ def _validar(text: str) -> str:
 
     clean = text.strip()
     if not clean:
-        raise EmptyTaskError("No podés agregar una tarea vacía.")
+        raise EmptyTaskError("No puedes agregar una tarea vacía.")
     if len(clean) > MAX_LENGTH:
         raise TaskTooLongError(
             f"La tarea es demasiado larga (máximo {MAX_LENGTH} caracteres)."

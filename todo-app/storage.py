@@ -1,6 +1,6 @@
 """Persistencia en SQLite. Segunda capa, entre la lógica pura y la UI.
 
-Acá vive SOLO I/O: leer y escribir filas. Ninguna regla de dominio. La
+Aquí vive SOLO I/O: leer y escribir filas. Ninguna regla de dominio. La
 validación sigue estando en tasks.py y storage no la duplica — sivivieran en los
 dos lados, "qué es una tarea válida" tendria dos respuestas y la app elegiría una.
 
